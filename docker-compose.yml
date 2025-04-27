@@ -1,0 +1,119 @@
+version: '3.8'
+
+
+
+services:
+  execution-db:
+    image: postgres:15
+    container_name: execution-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ExecutionDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - execution_data:/var/lib/postgresql/data
+
+  constrain-db:
+    image: mysql:8
+    container_name: constrain-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ConstrainDB
+    ports:
+      - "3307:3306"
+    volumes:
+      - constrain_data:/var/lib/mysql
+
+  question-db:
+    image: postgres:15
+    container_name: question-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: QuestionDB
+    ports:
+      - "5434:5432"
+    volumes:
+      - question_data:/var/lib/postgresql/data
+
+  result-db:
+    image: mysql:8
+    container_name: result-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ResultDB
+    ports:
+      - "3308:3306"
+    volumes:
+      - result_data:/var/lib/mysql
+
+  submition-db:
+    image: postgres:15
+    container_name: submition-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: SubmitionDB
+    ports:
+      - "5435:5432"
+    volumes:
+      - submition_data:/var/lib/postgresql/data
+
+  testcase-db:
+    image: mysql:8
+    container_name: testcase-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: TestCaseDB
+    ports:
+      - "3309:3306"
+    volumes:
+      - testcase_data:/var/lib/mysql
+
+  user-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: user-db
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1434:1433"
+    volumes:
+      - user_data:/var/opt/mssql
+
+  adhocrun-db:
+    image: postgres:15
+    container_name: adhocrun-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: AdHocRunDB
+    ports:
+      - "5436:5432"
+    volumes:
+      - adhocrun_data:/var/lib/postgresql/data
+
+  submitionresult-db:
+    image: mysql:8
+    container_name: submitionresult-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: SubmitionResultDB
+    ports:
+      - "3310:3306"
+    volumes:
+      - submitionresult_data:/var/lib/mysql
+
+volumes:
+  execution_data:
+  constrain_data:
+  question_data:
+  result_data:
+  submition_data:
+  testcase_data:
+  user_data:
+  adhocrun_data:
+  submitionresult_data:

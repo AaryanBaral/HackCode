@@ -1,0 +1,131 @@
+# .NET Core
+## Ignore build artifacts
+bin/
+obj/
+*.csproj.user
+*.pdb
+*.exe
+*.dll
+*.suo
+*.cache
+*.ilk
+*.log
+*.tlog
+*.metaproj
+*.binlog
+
+## Ignore NuGet packages and caches
+packages/
+*.nupkg
+.project.assets.json
+NuGet.Config
+.nuget/
+## Global NuGet cache (user-specific)
+~/.nuget/
+
+## Ignore test results
+TestResults/
+*.trx
+*.xml
+coverage.*
+
+## Ignore IDE/Editor files
+.vscode/
+.vs/
+.idea/
+*.sln
+*.sln.iml
+*.suo
+*.ntvs*
+*.ncb
+*.opensdf
+*.md
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore Visual Studio Code settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## Ignore Rider (JetBrains) files
+.idea/
+*.iml
+
+## Ignore environment-specific configuration
+appsettings.Development.json
+appsettings.*.json
+*.config
+*.user
+*.local
+secrets.json
+
+## Ignore Docker artifacts
+docker-compose.override.yml
+Dockerfile.user
+*.dockerignore
+## Docker build cache (optional, if large)
+**/docker/build/
+
+## Ignore logs
+*.log
+logs/
+Serilog/
+*.log.*
+
+## Ignore temporary files
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+## Ignore secrets and credentials
+*.pem
+*.key
+*.pfx
+*.cer
+*.crt
+*.pub
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+## Ignore database migration artifacts (EF Core)
+**/Migrations/*_initial.cs
+**/Migrations/*_designer.cs
+## Keep migration files you want to track
+!**/Migrations/*.cs
+
+## Ignore miscellaneous
+*.pidb
+*.scc
+*.vssscc
+*.vspscc
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.publishsettings
+*.azurePubxml
+*.elasticbeanstalk.*
+*.rdl.data
+*.bim.layout
+*.bim_*.settings
+*.rptproj.bak
+*.sqlproj.bak
+*.msi
+*.msix
+*.appx
+*.appxbundle
+*.appxupload
+
+## Ignore local test databases (e.g., SQLite for testing)
+*.db
+*.sqlite
+*.sqlite3

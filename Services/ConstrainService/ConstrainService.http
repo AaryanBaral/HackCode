@@ -1,0 +1,6 @@
+@ConstrainService_HostAddress = http://localhost:5224
+
+GET {{ConstrainService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

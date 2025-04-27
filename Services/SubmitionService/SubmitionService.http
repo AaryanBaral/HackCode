@@ -1,0 +1,6 @@
+@SubmitionService_HostAddress = http://localhost:5014
+
+GET {{SubmitionService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

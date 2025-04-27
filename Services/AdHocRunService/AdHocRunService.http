@@ -1,0 +1,6 @@
+@AdHocRunService_HostAddress = http://localhost:5033
+
+GET {{AdHocRunService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
