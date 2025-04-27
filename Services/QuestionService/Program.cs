@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Diagnostics;
+using QuestionService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddAppServices(builder.Configuration);
+builder.Services.AddRepositories(builder.Configuration);
 
 
 
 var app = builder.Build();
+app.UseCors("AllowAny");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -19,7 +22,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.MapGet("/", () => "HackCode is working bitchessssss!");
 app.UseAuthorization();
 
 app.UseExceptionHandler(handler =>
@@ -38,6 +41,7 @@ app.UseExceptionHandler(handler =>
     });
 });
 
+await app.Services.InitializeDbAsync();
 app.MapControllers();
 
 app.Run();

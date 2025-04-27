@@ -1,0 +1,23 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using QuestionService.Entities;
+using QuestionService.Models;
+
+namespace QuestionService.Mappers
+{
+    public static class QuestionMapper
+    {
+        public static Question ToQueston(this AddQuestionDto addQuestionDto, string createdBy){
+            return new Question(){
+                Title = addQuestionDto.Title,
+                Description = addQuestionDto.Description,
+                Difficulty = addQuestionDto.Difficulty,
+                MemoryLimit = addQuestionDto.MemoryLimit,
+                TimeLimit = addQuestionDto.TimeLimit,
+                CreatedBy = createdBy
+            };
+        }
+    }   
+}
