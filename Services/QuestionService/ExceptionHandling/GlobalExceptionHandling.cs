@@ -1,4 +1,3 @@
-
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
@@ -8,8 +7,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-namespace ExecutionService.ExceptionHandling;
-
+namespace QuestionService.ExceptionHandling;
 public class GlobalExceptionHandling : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandling> _logger;
