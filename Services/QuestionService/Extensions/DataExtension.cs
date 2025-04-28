@@ -20,7 +20,7 @@ namespace QuestionService.Extensions
         {
             var postgresConnString = configuration.GetConnectionString("PostgresConnection");
             Console.WriteLine(postgresConnString);
-            services.AddDbContext<AppDbContext>(options =>
+            services.AddDbContextFactory<AppDbContext>(options =>
             {
                 options.UseNpgsql(postgresConnString, npgsqlOptions =>
                         npgsqlOptions.EnableRetryOnFailure(

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using QuestionService.Extensions;
+using QuestionService.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddRepositories(builder.Configuration);
 
 var app = builder.Build();
 app.UseCors("AllowAny");
+app.UseMiddleware<DbTransactionMiddleware>(); 
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
