@@ -48,7 +48,6 @@ namespace QuestionService.Kafka
                         }
                         break;
                 }
-                _consumer.Close();
 
                 if (consumeResult?.Message != null)
                 {
@@ -57,6 +56,7 @@ namespace QuestionService.Kafka
                     _consumer.Commit(consumeResult); // Commit offset after processing
                 }
             }
+                _consumer.Close();
         }
         public Task<ValidateUserIDResponse> WaitForUserIDResponseAsync(string correlationID)
         {
