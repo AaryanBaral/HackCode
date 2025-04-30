@@ -1,9 +1,9 @@
-
+using QuestionService.Models;
 
 namespace QuestionService.Repositories
 {
-    public class IQuestionRepository
+    public interface IQuestionRepository
     {
-        
+        Task<bool> CreateQuestion(AddQuestionDto addQuestionDto, string userId);
     }
 }

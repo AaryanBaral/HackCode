@@ -1,5 +1,8 @@
+using System.Collections.Concurrent;
+using System.Text.Json;
 using Confluent.Kafka;
 using QuestionService.Configurations;
+using QuestionService.Models;
 
 namespace QuestionService.Kafka
 {
@@ -8,6 +11,7 @@ namespace QuestionService.Kafka
         private readonly IConsumer<Null, string> _consumer;
         private readonly string[] _topics;
         private readonly ILogger<KafkaConsumer> _logger;
+        private readonly ConcurrentDictionary<string, TaskCompletionSource<ValidateUserIDResponse>> _userIDResponses = new();
 
         public KafkaConsumer(KafkaConfig config, string[] topics, ILogger<KafkaConsumer> logger)
         {
@@ -28,15 +32,37 @@ namespace QuestionService.Kafka
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var result = _consumer.Consume(cancellationToken);
-                
-                if (result?.Message != null)
+                var consumeResult = _consumer.Consume(cancellationToken);
+                var correlationID = consumeResult.Message.Headers
+                .FirstOrDefault(h => h.Key == "correlationID")?.GetValueBytes() ?? throw new NullReferenceException("The header is null");
+                var correlationIDString = System.Text.Encoding.UTF8.GetString(correlationID);
+
+                switch (consumeResult.Topic)
                 {
-                    _logger.LogInformation("Consumed message from topic {Topic}: {Message}", result.Topic, result.Message.Value);
-                    await messageHandler(result.Message.Value);
-                    _consumer.Commit(result); // Commit offset after processing
+                    case "validateUserID-request":
+                        var message = JsonSerializer.Deserialize<ValidateUserIDResponse>(consumeResult.Message.Value)
+                        ?? throw new ArgumentNullException("The givan value is null for validating user");
+                        if (_userIDResponses.TryRemove(correlationIDString, out var tcs))
+                        {
+                            tcs.SetResult(message);
+                        }
+                        break;
+                }
+                _consumer.Close();
+
+                if (consumeResult?.Message != null)
+                {
+                    _logger.LogInformation("Consumed message from topic {Topic}: {Message}", consumeResult.Topic, consumeResult.Message.Value);
+                    await messageHandler(consumeResult.Message.Value);
+                    _consumer.Commit(consumeResult); // Commit offset after processing
                 }
             }
+        }
+        public Task<ValidateUserIDResponse> WaitForUserIDResponseAsync(string correlationID)
+        {
+            var tcs = new TaskCompletionSource<ValidateUserIDResponse>();
+            _userIDResponses.TryAdd(correlationID, tcs);
+            return tcs.Task;
         }
     }
 
