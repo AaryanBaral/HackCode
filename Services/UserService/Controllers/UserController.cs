@@ -20,13 +20,14 @@ namespace UserService.Controllers
     {
         private readonly UserDbContext _context;
         private readonly IUserServiceRepository _userRepo;
-            private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
-        public UserController(UserDbContext context, IUserServiceRepository userRepo,IConfiguration Configuration)
+        public UserController(UserDbContext context, IUserServiceRepository userRepo, IConfiguration Configuration)
         {
+            
             _context = context;
             _userRepo = userRepo;
-                _configuration = Configuration;
+            _configuration = Configuration;
         }
 
         [HttpPost("register")]
@@ -58,34 +59,36 @@ namespace UserService.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<User>> LoginUser(LoginUserDto login)
         {
-            var user =await _userRepo.LoginUser(login);
-            if(user == null){
+            var user = await _userRepo.LoginUser(login);
+            if (user == null)
+            {
                 return BadRequest("Wrong Password");
             }
             String token = CreateToken(user);
             return Ok(token);
         }
 
-        
-        public String CreateToken(User user){
-            var claims= new List<Claim>{
+
+        public String CreateToken(User user)
+        {
+            var claims = new List<Claim>{
                 new Claim(ClaimTypes.Name,user.UserName),
 
             };
-             var key= new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<String>("AppSettings:token")!));
-             var creds =new SigningCredentials(key,SecurityAlgorithms.HmacSha512);
-             var tokenDescriptor=new JwtSecurityToken(
-                issuer:_configuration.GetValue<String>("AppSettings:issuer"),
-                audience:_configuration.GetValue<String>("AppSettings:audience"),
-                claims:claims,
-                expires: DateTime.UtcNow.AddMinutes(10),
-                signingCredentials:creds
-             );
-              return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-                
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<String>("AppSettings:token")!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            var tokenDescriptor = new JwtSecurityToken(
+               issuer: _configuration.GetValue<String>("AppSettings:issuer"),
+               audience: _configuration.GetValue<String>("AppSettings:audience"),
+               claims: claims,
+               expires: DateTime.UtcNow.AddMinutes(10),
+               signingCredentials: creds
+            );
+            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
 
 
-             
+
+
 
         }
     }
