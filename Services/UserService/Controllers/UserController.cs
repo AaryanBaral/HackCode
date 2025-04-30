@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
+
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
 using UserService.Data;
 using UserService.Entities;
 using UserService.Interfaces;
 using UserService.Mappers;
 using UserService.Models;
-using UserService.Repositories;
 
 namespace UserService.Controllers
 {
