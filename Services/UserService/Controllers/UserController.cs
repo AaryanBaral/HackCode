@@ -12,10 +12,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 using UserService.Data;
 using UserService.Entities;
-using UserService.Interfaces;
+// using UserService.Interfaces;
 using UserService.Mappers;
 using UserService.Models;
-using UserService.Repositories;
+// using UserService.Repositories;
+using UserService.services;
 
 namespace UserService.Controllers
 {
@@ -24,77 +25,111 @@ namespace UserService.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserDbContext _context;
-        private readonly IUserServiceRepository _userRepo;
-        private readonly IConfiguration _configuration;
+        private readonly UserManager<User> _userManager;
+        private readonly ITokenService _tokenService;
+        private readonly SignInManager<User> _signInManager;
 
-        public UserController(UserDbContext context, IUserServiceRepository userRepo, IConfiguration Configuration)
+        // private readonly IConfiguration _configuration;
+
+        public UserController(UserDbContext context, UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager)
         {
-            
+
             _context = context;
-            _userRepo = userRepo;
-            _configuration = Configuration;
+            _signInManager = signInManager;
+            // _configuration = Configuration;
+            _userManager = userManager;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
 
         public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == register.Email);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var existingUser = await _userManager.Users
+       .FirstOrDefaultAsync(u => u.Email == register.Email);
+
             if (existingUser != null)
-            {
-                return BadRequest("User Already Exists");
-            }
+                return Conflict("User with the given email already exists.");
 
-            var Hasher = new PasswordHasher<User>();
-            var newUser = register.ToRegisterUser(Hasher);
-            await _userRepo.RegisterUser(newUser);
-
-            if (newUser == null)
+            var user = new User
             {
-                return BadRequest("no user detail provided");
+                UserName = register.UserName,
+                Email = register.Email,
+                CreatedOn = DateTime.UtcNow
+
+            };
+            var createdUser = await _userManager.CreateAsync(user, register.Password);
+            if (createdUser.Succeeded)
+            {
+                var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                if (roleResult.Succeeded)
+                {
+                    return CreatedAtAction(nameof(RegisterUser), new { id = user.Id }, user);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Failed to assign role");
+                }
             }
             else
             {
-                return CreatedAtAction(nameof(RegisterUser), new { id = newUser.Id }, newUser);
+                throw new InvalidOperationException("user creation failed");
             }
-
-
-
         }
         [HttpPost("login")]
-        public async Task<ActionResult<User>> LoginUser(LoginUserDto login)
+        public async Task<ActionResult<newUserDto>> LoginUser(LoginUserDto login)
         {
-            var user = await _userRepo.LoginUser(login);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == login.Email);
             if (user == null)
             {
-                return BadRequest("Wrong Password");
+                return BadRequest("");
             }
-            String token = CreateToken(user);
-            return Ok(token);
-        }
 
-
-        public String CreateToken(User user)
-        {
-            var claims = new List<Claim>{
-                new Claim(ClaimTypes.Name,user.UserName),
-
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<String>("AppSettings:token")!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-            var tokenDescriptor = new JwtSecurityToken(
-               issuer: _configuration.GetValue<String>("AppSettings:issuer"),
-               audience: _configuration.GetValue<String>("AppSettings:audience"),
-               claims: claims,
-               expires: DateTime.UtcNow.AddMinutes(10),
-               signingCredentials: creds
+            var result = await _signInManager.CheckPasswordSignInAsync(user, login.Password, false);
+            if (!result.Succeeded)
+            {
+                throw new UnauthorizedAccessException("Username not found or incorrect password");
+            }
+            ;
+            return Ok(
+             new newUserDto
+             {
+                 UserName = user.UserName,
+                 Email = user.Email,
+                 Token = _tokenService.CreateToken(user)
+             }
             );
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-
-
-
-
-
         }
+
+
+        // public String CreateToken(User user)
+        // {
+        //     var claims = new List<Claim>{
+        //         new Claim(ClaimTypes.Name,user.UserName),
+
+        //     };
+        //     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<String>("AppSettings:token")!));
+        //     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+        //     var tokenDescriptor = new JwtSecurityToken(
+        //        issuer: _configuration.GetValue<String>("AppSettings:issuer"),
+        //        audience: _configuration.GetValue<String>("AppSettings:audience"),
+        //        claims: claims,
+        //        expires: DateTime.UtcNow.AddMinutes(10),
+        //        signingCredentials: creds
+        //     );
+        //     return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+
+
+
+
+
+        // }
     }
 }
