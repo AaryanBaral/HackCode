@@ -63,7 +63,7 @@ namespace UserService.Controllers
             {
                 var roleResult = await _userManager.AddToRoleAsync(user, "User");
                 if (roleResult.Succeeded)
-                {
+                {  
                     return CreatedAtAction(nameof(RegisterUser), new { id = user.Id }, user);
                 }
                 else
@@ -73,6 +73,7 @@ namespace UserService.Controllers
             }
             else
             {
+
                 throw new InvalidOperationException("user creation failed");
             }
         }
