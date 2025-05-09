@@ -73,7 +73,6 @@ namespace UserService.Controllers
         {
             var claims = new List<Claim>{
                 new Claim(ClaimTypes.Name,user.UserName),
-
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<String>("AppSettings:token")!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
