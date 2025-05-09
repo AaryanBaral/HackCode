@@ -2,14 +2,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserService.Data;
 using UserService.Entities;
-using UserService.Interfaces;
 using UserService.Models;
 
 namespace UserService.Repositories
 {
 
 
-    public class UserServiceRepository : IUserServiceRepository
+    public class UserServiceRepository : IUserRepository
     {
         private readonly UserDbContext _context;
     

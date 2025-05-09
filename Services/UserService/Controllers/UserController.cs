@@ -11,11 +11,8 @@ using UserService.Entities;
 // using UserService.Interfaces;
 using UserService.Mappers;
 using UserService.Models;
-<<<<<<< HEAD
-=======
 // using UserService.Repositories;
 using UserService.services;
->>>>>>> 4bbba4ced183b0d97c5de803738911a17dbd1df8
 
 namespace UserService.Controllers
 {
