@@ -10,9 +10,9 @@ namespace QuestionService.Repositories
         private readonly AppDbContext _context = context;
 
         public async Task<bool> CreateQuestion(AddQuestionDto addQuestionDto, string userId){
+
             // user id is already validated 
             Question question = QuestionMapper.ToQueston(addQuestionDto,userId);
-            
             await _context.Questions.AddAsync(question);
             await _context.SaveChangesAsync();
             return true;
