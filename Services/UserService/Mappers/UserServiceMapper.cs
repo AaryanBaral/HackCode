@@ -14,8 +14,9 @@ namespace UserService.Mappers
             var user= new User{
                 UserName=dto.UserName,
                 Email=dto.Email,
+                CreatedOn= DateTime.Now,
+                PasswordHash=dto.Password
             };
-             user.PasswordHash=Hasher.HashPassword(user,dto.Password);
              return user;
 
         }
@@ -23,8 +24,9 @@ namespace UserService.Mappers
         public static User ToLoginUser(this LoginUserDto dto,PasswordHasher<User> Hasher){
             var user= new User{
                 Email=dto.Email,
+                PasswordHash= dto.Password
             };
-            user.PasswordHash=Hasher.HashPassword(user,dto.Password);
+            
             return user;
         }
     }
