@@ -8,6 +8,7 @@ namespace QuestionService.Models
 {
     public class AddQuestionDto
     {
+        public string QuestionId { get; set; }
         public required  string Title {get; set;}
         public required  string Description {get; set;}
         public required  DifficultyEnum Difficulty {get; set;}
