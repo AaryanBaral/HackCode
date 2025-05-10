@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using Confluent.Kafka;
+using Microsoft.Extensions.Options;
 using QuestionService.Configurations;
 using QuestionService.Models;
 
@@ -13,9 +14,15 @@ namespace QuestionService.Kafka
         private readonly ILogger<KafkaConsumer> _logger;
         private readonly ConcurrentDictionary<string, TaskCompletionSource<ValidateUserIDResponse>> _userIDResponses = new();
 
-        public KafkaConsumer(KafkaConfig config, string[] topics, ILogger<KafkaConsumer> logger)
+
+    //IOptions<T> is a built-in abstraction in ASP.NET Core used to bind configuration settings 
+    // (from appsettings.json, environment variables, etc.) to strongly-typed C# classes.
+    //  to use KafkaConfig inside the Ioptions or for the Ioptions class to use the kafka config
+    // we add the kafkaConfig class to the DI 
+        public KafkaConsumer(IOptions<KafkaConfig> options, string[] topics, ILogger<KafkaConsumer> logger)
         {
             _logger = logger;
+            var config = options.Value;
             var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = config.BootstrapServers,
@@ -65,5 +72,5 @@ namespace QuestionService.Kafka
             return tcs.Task;
         }
     }
-
 }
+

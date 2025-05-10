@@ -1,6 +1,7 @@
 
 using System.Text.Json;
 using Confluent.Kafka;
+using Microsoft.Extensions.Options;
 using QuestionService.Configurations;
 
 namespace QuestionService.Kafka
@@ -10,8 +11,9 @@ namespace QuestionService.Kafka
         private readonly ILogger<KafkaProducer> _logger;
         private readonly IProducer<Null, string> _producer;
 
-        public KafkaProducer(KafkaConfig config, ILogger<KafkaProducer> logger)
+        public KafkaProducer(IOptions<KafkaConfig> options, ILogger<KafkaProducer> logger)
         {
+            var config = options.Value;
             _logger = logger;
             var producerCongig = new ProducerConfig()
             {
