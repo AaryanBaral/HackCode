@@ -24,7 +24,7 @@ namespace QuestionService.Services
 
             if (!response.IsValid)
             {
-                throw new KeyNotFoundException($"given key not found {response.Message}");
+                throw new KeyNotFoundException($"Given UserId is not valid {response.Message}");
             }
 
             
