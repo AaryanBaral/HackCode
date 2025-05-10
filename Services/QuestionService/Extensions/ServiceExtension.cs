@@ -1,9 +1,11 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using QuestionService.Configurations;
 using QuestionService.ExceptionHandling;
+using QuestionService.Kafka;
 using QuestionService.Repositories;
 
 namespace QuestionService.Extensions
@@ -18,8 +20,21 @@ namespace QuestionService.Extensions
             services.AddExceptionHandler<GlobalExceptionHandling>();
             services.AddRepositories();
             services.AddJwtAuthentication(configuration);
+
         }
 
+
+        private static void AddKafkaService(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHostedService<KafkaConsumerHostedService>();
+
+            //  adding the kafka config to the di and mapping it to the section of the appsetting.json
+            //  so that it can be accessed using Ioption anywahere over the app
+            services.Configure<KafkaConfig>(configuration.GetSection("kafka"));
+
+            services.AddSingleton<KafkaProducer>();
+            services.AddSingleton<KafkaConsumer>();
+        }
         private static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IQuestionRepository, QuestionRepository>();
@@ -56,7 +71,7 @@ namespace QuestionService.Extensions
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = config.Issuer, 
+                ValidIssuer = config.Issuer,
                 ValidAudience = config.Audience,
             };
 
