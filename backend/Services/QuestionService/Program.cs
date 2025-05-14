@@ -46,4 +46,11 @@ app.UseExceptionHandler(handler =>
 await app.Services.InitializeDbAsync();
 app.MapControllers();
 
+
+
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var url = $"Application started at: http://localhost:{builder.Configuration["ApplicationPort"]}";
+    Console.WriteLine(url);
+});
 app.Run();

@@ -15,12 +15,12 @@ namespace QuestionService.Kafka
         {
             var config = options.Value;
             _logger = logger;
-            var producerCongig = new ProducerConfig()
+            var producerConfig = new ProducerConfig()
             {
                 BootstrapServers = config.BootstrapServers,
                 ClientId = config.ProducerClientId
             };
-            _producer = new ProducerBuilder<Null, string>(producerCongig).Build();
+            _producer = new ProducerBuilder<Null, string>(producerConfig).Build();
         }
 
         public async Task ProduceAsync<T>(string topic, T message, string correlationId)
