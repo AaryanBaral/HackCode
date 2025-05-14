@@ -13,7 +13,7 @@ namespace UserService.Repositories
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
-        public AuthRepository(UserManager<User> userManager,SignInManager<User> signInManager)
+        public AuthRepository(UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -35,15 +35,22 @@ namespace UserService.Repositories
             await _userManager.AddToRoleAsync(user, role);
         }
 
-        public async Task<bool> CheckPasswordAsync(User user, string password,bool lockoutOnFailure = false)
+        public async Task<bool> CheckPasswordAsync(User user, string password, bool lockoutOnFailure = false)
         {
             return await _userManager.CheckPasswordAsync(user, password);
         }
 
-        public async Task<List<string>> GetAllUserIds(){
+        public async Task<List<string>> GetAllUserIds()
+        {
             return await _userManager.Users
             .Select(u => u.Id)
             .ToListAsync();
+        }
+
+        public async Task<bool> ValidateUserId(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            return user != null;
         }
     }
 }
