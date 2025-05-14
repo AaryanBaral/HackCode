@@ -13,6 +13,7 @@ using UserService.Services.AuthenticationService;
 using UserService.Services.JWTService;
 using Microsoft.AspNetCore.Diagnostics;
 using UserService.ExceptionHandling;
+using UserService.Services.KafkaServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // Add scoped services
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<KafkaServices>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJWTService, JWTService>(); 
 

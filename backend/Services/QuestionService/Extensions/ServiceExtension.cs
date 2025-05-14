@@ -18,6 +18,7 @@ namespace QuestionService.Extensions
             services.AddCorsConfiguration();
             services.AddExceptionHandler<GlobalExceptionHandling>();
             services.AddRepositories();
+            services.AddKafkaService(configuration);
             services.AddJwtAuthentication(configuration);
 
         }
@@ -33,6 +34,8 @@ namespace QuestionService.Extensions
 
             services.AddSingleton<KafkaProducer>();
             services.AddSingleton<KafkaConsumer>();
+            string[] kafkaTopics = ["validateUserID-request", "other-topic"];
+            services.AddSingleton(kafkaTopics);
         }
         private static void AddRepositories(this IServiceCollection services)
         {

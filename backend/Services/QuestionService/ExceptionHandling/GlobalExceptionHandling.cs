@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Net;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,14 @@ public class GlobalExceptionHandling : IExceptionHandler
     {
         return exception switch
         {
+            ConsumeException ex when (ex.Error.Code == ErrorCode.UnknownTopicId) =>
+     ((int)HttpStatusCode.BadRequest,
+     $"Kafka topic not available: {ex.Error.Reason}",
+     "KAFKA_TOPIC_UNAVAILABLE"),
+            ConsumeException ex when (ex.Error.IsFatal) =>
+                ((int)HttpStatusCode.ServiceUnavailable,
+                $"Kafka broker unavailable: {ex.Message}",
+                "KAFKA_UNAVAILABLE"),
             ArgumentOutOfRangeException => ((int)HttpStatusCode.BadRequest, exception.Message, "ARG_OUT_OF_RANGE"),
             ArgumentNullException => ((int)HttpStatusCode.BadRequest, exception.Message, "ARG_NULL"),
             ArgumentException => ((int)HttpStatusCode.BadRequest, exception.Message, "ARG_INVALID"),
