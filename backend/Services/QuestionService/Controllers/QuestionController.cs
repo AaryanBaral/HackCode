@@ -1,15 +1,6 @@
-
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Confluent.Kafka;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using QuestionService.Data;
 using QuestionService.Models;
-using QuestionService.Repositories;
 using QuestionService.Services;
 
 namespace UserService.Controllers
@@ -35,7 +26,7 @@ namespace UserService.Controllers
         {
             var userId = User.FindFirst("UserId")?.Value ?? throw new NullReferenceException("Token is not Valid");
             await _questionService.AddQuestionAsync(addQuestionDto, userId);
-            return Ok(new ApiResponse<string>(){
+            return Ok(new APIResponse<string>(){
                 Data = "Question Addded successfully"
             });
         }

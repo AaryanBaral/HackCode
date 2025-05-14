@@ -7,10 +7,10 @@ namespace AdHocRunService.Entities
 {
     public class Playground
     {
-        public string Id { get; set; }
-        public string UserId { get; set; } = default!;
-        public string Code { get; set; } = default!;
-        public string Language { get; set; } = "python"; // default
+        public string Id { get; set; }  = Guid.NewGuid().ToString();
+        public required string UserId { get; set; } = default!;
+        public required string Code { get; set; } = default!;
+        public required string Language { get; set; }
         public string Output { get; set; } = default!;
         public string Error { get; set; } = default!;
         public bool IsSuccess { get; set; }
