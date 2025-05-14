@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using QuestionService.Extensions;
+using QuestionService.Kafka;
 using QuestionService.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,10 +48,29 @@ await app.Services.InitializeDbAsync();
 app.MapControllers();
 
 
+// ✅ Delay Kafka startup
+var lifetime = app.Lifetime;
+var kafkaConsumer = app.Services.GetRequiredService<KafkaConsumer>();
 
-app.Lifetime.ApplicationStarted.Register(() =>
+lifetime.ApplicationStarted.Register(() =>
 {
-    var url = $"Application started at: http://localhost:{builder.Configuration["ApplicationPort"]}";
-    Console.WriteLine(url);
+    Task.Run(async () =>
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Kafka consumer starting after application is ready.");
+
+        try
+        {
+            await kafkaConsumer.ConsumeAsync(async message =>
+            {
+                Console.WriteLine($"Handling extra logic for: {message}");
+                // You can add more logic here
+            }, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Kafka consumer crashed.");
+        }
+    });
 });
 app.Run();

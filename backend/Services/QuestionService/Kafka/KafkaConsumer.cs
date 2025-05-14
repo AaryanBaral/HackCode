@@ -15,23 +15,32 @@ namespace QuestionService.Kafka
         private readonly ConcurrentDictionary<string, TaskCompletionSource<ValidateUserIDResponse>> _userIDResponses = new();
 
 
-    //IOptions<T> is a built-in abstraction in ASP.NET Core used to bind configuration settings 
-    // (from appsettings.json, environment variables, etc.) to strongly-typed C# classes.
-    //  to use KafkaConfig inside the Ioptions or for the Ioptions class to use the kafka config
-    // we add the kafkaConfig class to the DI 
+        //IOptions<T> is a built-in abstraction in ASP.NET Core used to bind configuration settings 
+        // (from appsettings.json, environment variables, etc.) to strongly-typed C# classes.
+        //  to use KafkaConfig inside the Ioptions or for the Ioptions class to use the kafka config
+        // we add the kafkaConfig class to the DI 
         public KafkaConsumer(IOptions<KafkaConfig> options, string[] topics, ILogger<KafkaConsumer> logger)
         {
+
+
             _logger = logger;
             var config = options.Value;
+            var bootstrapServers = config.BootstrapServers;
+            var groupId = config.ConsumerGroupId;
+            _topics = topics;
+
+            if (string.IsNullOrEmpty(bootstrapServers))
+                throw new ArgumentNullException(nameof(bootstrapServers), "Kafka:BootstrapServers is not configured.");
+            if (string.IsNullOrEmpty(groupId))
+                throw new ArgumentNullException(nameof(groupId), "Kafka:GroupId is not configured.");
+
             var consumerConfig = new ConsumerConfig
             {
-                BootstrapServers = config.BootstrapServers,
-                GroupId = config.ConsumerGroupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = false // Manual commit for reliability
+                BootstrapServers = bootstrapServers,
+                GroupId = groupId,
+                AutoOffsetReset = AutoOffsetReset.Earliest
             };
             _consumer = new ConsumerBuilder<Null, string>(consumerConfig).Build();
-            _topics = topics;
             _consumer.Subscribe(topics);
         }
 
@@ -39,7 +48,8 @@ namespace QuestionService.Kafka
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var consumeResult = _consumer.Consume(cancellationToken);
+                var consumeResult = _consumer.Consume(TimeSpan.FromSeconds(5));
+                if (consumeResult is null) continue;
                 var correlationID = consumeResult.Message.Headers
                 .FirstOrDefault(h => h.Key == "correlationID")?.GetValueBytes() ?? throw new NullReferenceException("The header is null");
                 var correlationIDString = System.Text.Encoding.UTF8.GetString(correlationID);
@@ -63,7 +73,7 @@ namespace QuestionService.Kafka
                     _consumer.Commit(consumeResult); // Commit offset after processing
                 }
             }
-                _consumer.Close();
+            _consumer.Close();
         }
         public Task<ValidateUserIDResponse> WaitForUserIDResponseAsync(string correlationID)
         {
