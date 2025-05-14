@@ -39,5 +39,11 @@ namespace UserService.Repositories
         {
             return await _userManager.CheckPasswordAsync(user, password);
         }
+
+        public async Task<List<string>> GetAllUserIds(){
+            return await _userManager.Users
+            .Select(u => u.Id)
+            .ToListAsync();
+        }
     }
 }
