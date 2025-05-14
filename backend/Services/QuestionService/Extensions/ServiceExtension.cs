@@ -26,7 +26,7 @@ namespace QuestionService.Extensions
 
         private static void AddKafkaService(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHostedService<KafkaConsumerHostedService>();
+            // services.AddHostedService<KafkaConsumerHostedService>();
 
             //  adding the kafka config to the di and mapping it to the section of the appsetting.json
             //  so that it can be accessed using Ioption anywahere over the app
